@@ -74,6 +74,10 @@ public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit {
             @Override
             protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
                 Log.i(TAG, "beforeHookedMethod: onConfigureWindow");
+                // This forces the 2nd argument of the method to be always false.
+                // Hence when the onConfigureWindow method is executed, it executes assuming
+                // that it doesn't have to configure the window as fullscreen.
+                // This fixes window re-configuration of input fields in landscape mode.
                 methodHookParam.args[1] = false;
             }
         });
