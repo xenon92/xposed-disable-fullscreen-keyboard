@@ -34,14 +34,11 @@ import de.robv.android.xposed.XposedHelpers;
  */
 public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit {
 
-    public static final String CLASS_INPUT_METHOD_SERVICE = "android.inputmethodservice.InputMethodService";
+    private static final String CLASS_INPUT_METHOD_SERVICE = "android.inputmethodservice.InputMethodService";
     private static final String TAG = "DisableFullscreenKeyboard";
-    public static String MODULE_PATH = null;
 
     @Override
     public void initZygote(IXposedHookZygoteInit.StartupParam startupParam) throws Throwable {
-
-        MODULE_PATH = startupParam.modulePath;
 
         final Class<?> mInputMethodServiceClass = XposedHelpers.findClass(CLASS_INPUT_METHOD_SERVICE, null);
 
