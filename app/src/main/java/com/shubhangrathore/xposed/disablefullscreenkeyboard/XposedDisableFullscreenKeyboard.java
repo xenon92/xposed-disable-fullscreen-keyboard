@@ -22,6 +22,7 @@
 
 package com.shubhangrathore.xposed.disablefullscreenkeyboard;
 
+import android.util.Log;
 import android.view.Window;
 
 import de.robv.android.xposed.IXposedHookZygoteInit;
@@ -34,6 +35,7 @@ import de.robv.android.xposed.XposedHelpers;
 public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit {
 
     public static final String CLASS_INPUT_METHOD_SERVICE = "android.inputmethodservice.InputMethodService";
+    private static final String TAG = "DisableFullscreenKeyboard";
     public static String MODULE_PATH = null;
 
     @Override
@@ -43,30 +45,38 @@ public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit {
 
         final Class<?> mInputMethodServiceClass = XposedHelpers.findClass(CLASS_INPUT_METHOD_SERVICE, null);
 
+        Log.i(TAG, "Hooking to method onEvaluateFullscreenMode");
         XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "onEvaluateFullscreenMode", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
+                Log.i(TAG, "beforeHookedMethod: onEvaluateFullscreenMode");
                 methodHookParam.setResult(false);
             }
         });
 
+        Log.i(TAG, "Hooking to method isFullscreenMode");
         XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "isFullscreenMode", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
+                Log.i(TAG, "beforeHookedMethod: isFullscreenMode");
                 methodHookParam.setResult(false);
             }
         });
 
+        Log.i(TAG, "Hooking to method isExtractViewShown");
         XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "isExtractViewShown", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
+                Log.i(TAG, "beforeHookedMethod: isExtractViewShown");
                 methodHookParam.setResult(false);
             }
         });
 
+        Log.i(TAG, "Hooking to method onConfigureWindow");
         XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "onConfigureWindow", Window.class, boolean.class, boolean.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
+                Log.i(TAG, "beforeHookedMethod: onConfigureWindow");
                 methodHookParam.args[1] = false;
             }
         });
