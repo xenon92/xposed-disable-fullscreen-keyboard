@@ -14,6 +14,7 @@ android {
     buildTypes {
         release {
             runProguard false
+            proguardFiles file ('C:\\Users\\Shubhang\\Dropbox\\Git\\xposed-disable-fullscreen-keyboard\\app\\proguard-rules.pro')
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

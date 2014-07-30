@@ -16,4 +16,4 @@
 #   public *;
 #}
 
--keep public class XposedDisableFullscreenKeyboard
+-keep public class com.shubhangrathore.xposed.disablefullscreenkeyboard.XposedDisableFullscreenKeyboard
