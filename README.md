@@ -1,6 +1,8 @@
 Disable Fullscreen Keyboard
 ===
 
+###Read more about the app [HERE](http://blog.shubhangrathore.com/disable-fullscreen-keyboard/index.html).
+
 An open source Xposed module for android, to disable fullscreen keyboard along with the text input field that takes up the whole screen in landscape orientation.
 
 It works with all android keyboards, including SwiftKey, Swype, Google keyboard, AOSP keyboard etc. 
