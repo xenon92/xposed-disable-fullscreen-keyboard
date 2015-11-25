@@ -25,16 +25,20 @@ package com.shubhangrathore.xposed.disablefullscreenkeyboard;
 import android.util.Log;
 import android.view.Window;
 
+import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.IXposedHookZygoteInit;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
+import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 /**
  * Created by Shubhang Rathore on 29/7/2014.
  */
-public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit {
+public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit, IXposedHookLoadPackage {
 
     private static final String CLASS_INPUT_METHOD_SERVICE = "android.inputmethodservice.InputMethodService";
+    private static final String SWIFTKEY_KEYBOARD = "com.touchtype.swiftkey";
+    private static final String SWIFTKEY_CLASS = "com.touchtype.keyboard.service.TouchTypeSoftKeyboard";
     private static final String TAG = "DisableFullscreenKeyboard";
 
     @Override
@@ -79,6 +83,32 @@ public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit {
                 // that it doesn't have to configure the window as fullscreen.
                 // This fixes window re-configuration of input fields in landscape mode.
                 methodHookParam.args[1] = false;
+            }
+        });
+    }
+
+    /**
+     * New updates to SwiftKey have implemented a custom onEvaluateFullscreenMode method
+     * instead of using the standard onEvaluateFullscreenMode method from the android
+     * InputMethodService. Hooking the custom method so it returns "false" to emulate
+     * potrait mode even in landscape. Hence, in landscape mode, the keyboard doesn't
+     * re-configure to full screen.
+     * @param loadPackageParam
+     * @throws Throwable
+     */
+    @Override
+    public void handleLoadPackage(XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
+
+        //If package is not com.touchtype.swiftkey, return and not execute further
+        if (!loadPackageParam.packageName.equals(SWIFTKEY_KEYBOARD)) {
+            return;
+        }
+
+        XposedHelpers.findAndHookMethod(SWIFTKEY_CLASS, loadPackageParam.classLoader, "onEvaluateFullscreenMode", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam methodHookParam) throws Throwable {
+                Log.i(TAG, "Hooking to SwiftKey onEvaluateFullscreenMode Method");
+                methodHookParam.setResult(false);
             }
         });
     }
