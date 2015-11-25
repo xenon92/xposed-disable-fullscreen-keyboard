@@ -41,43 +41,41 @@ public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit, I
     private static final String SWIFTKEY_CLASS = "com.touchtype.keyboard.service.TouchTypeSoftKeyboard";
     private static final String TAG = "DisableFullscreenKeyboard";
 
+    private static boolean DEBUG = false;
+
     @Override
     public void initZygote(IXposedHookZygoteInit.StartupParam startupParam) throws Throwable {
 
         final Class<?> mInputMethodServiceClass = XposedHelpers.findClass(CLASS_INPUT_METHOD_SERVICE, null);
 
-        Log.i(TAG, "Hooking to method onEvaluateFullscreenMode");
         XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "onEvaluateFullscreenMode", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
-                Log.i(TAG, "beforeHookedMethod: onEvaluateFullscreenMode");
+                if (DEBUG) { Log.i(TAG, "beforeHookedMethod: onEvaluateFullscreenMode"); }
                 methodHookParam.setResult(false);
             }
         });
 
-        Log.i(TAG, "Hooking to method isFullscreenMode");
         XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "isFullscreenMode", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
-                Log.i(TAG, "beforeHookedMethod: isFullscreenMode");
+                if (DEBUG) { Log.i(TAG, "beforeHookedMethod: isFullscreenMode"); }
                 methodHookParam.setResult(false);
             }
         });
 
-        Log.i(TAG, "Hooking to method isExtractViewShown");
         XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "isExtractViewShown", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
-                Log.i(TAG, "beforeHookedMethod: isExtractViewShown");
+                if (DEBUG) { Log.i(TAG, "beforeHookedMethod: isExtractViewShown"); }
                 methodHookParam.setResult(false);
             }
         });
 
-        Log.i(TAG, "Hooking to method onConfigureWindow");
         XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "onConfigureWindow", Window.class, boolean.class, boolean.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
-                Log.i(TAG, "beforeHookedMethod: onConfigureWindow");
+                if (DEBUG) { Log.i(TAG, "beforeHookedMethod: onConfigureWindow"); }
                 // This forces the 2nd argument of the method to be always false.
                 // Hence when the onConfigureWindow method is executed, it executes assuming
                 // that it doesn't have to configure the window as fullscreen.
@@ -107,7 +105,7 @@ public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit, I
         XposedHelpers.findAndHookMethod(SWIFTKEY_CLASS, loadPackageParam.classLoader, "onEvaluateFullscreenMode", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam methodHookParam) throws Throwable {
-                Log.i(TAG, "Hooking to SwiftKey onEvaluateFullscreenMode Method");
+                if (DEBUG) { Log.i(TAG, "Hooking to SwiftKey onEvaluateFullscreenMode Method"); }
                 methodHookParam.setResult(false);
             }
         });
