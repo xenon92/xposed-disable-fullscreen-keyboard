@@ -45,10 +45,10 @@ Downloads
 
 ![](https://raw.githubusercontent.com/xenon92/blog/gh-pages/content/images/2015/11/1c50f4dc2c41c8c.png)
 
-- **[Google Play Store](https://play.google.com/store/apps/details?id=com.shubhangrathore.xposed.disablefullscreenkeyboard)
+- **[Google Play Store](https://play.google.com/store/apps/details?id=com.shubhangrathore.xposed.disablefullscreenkeyboard)**
 - '**[Releases](https://github.com/xenon92/xposed-disable-fullscreen-keyboard/releases)**' section in my Github source.
 - **[Xposed module repository](http://repo.xposed.info/module/com.shubhangrathore.xposed.disablefullscreenkeyboard)**
-- **[Donate version](https://play.google.com/store/apps/details?id=com.shubhangrathore.xposed.disablefullscreenkeyboard.donate) on the Google Play Store
+- **[Donate version](https://play.google.com/store/apps/details?id=com.shubhangrathore.xposed.disablefullscreenkeyboard.donate)** on the Google Play Store
 
 Changelog
 ---
