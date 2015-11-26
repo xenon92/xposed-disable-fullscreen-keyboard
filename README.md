@@ -9,21 +9,17 @@ It works with all android keyboards, including SwiftKey, Swype, Google keyboard,
 
 The module doesn't have a GUI. Just enable it in Xposed Installer, and it will do its magic.
 
+With over 100,000+ downloads through **[Xposed module repository](http://repo.xposed.info/module/com.shubhangrathore.xposed.disablefullscreenkeyboard)**.
+
 
 Screenshots
 ---
 
-####SwiftKey
+![](https://raw.githubusercontent.com/xenon92/blog/gh-pages/content/images/2015/11/play_swiftkey.jpg?raw=true)
 
-![](https://raw.githubusercontent.com/xenon92/blog/4dfe473550069cb2c324d67b4dd3f75492a45f8a/content/images/2014/Jul/Swiftkey.png?raw=true)
+![](https://raw.githubusercontent.com/xenon92/blog/gh-pages/content/images/2015/11/play_swype.jpg?raw=true)
 
-####Swype
-
-![](https://raw.githubusercontent.com/xenon92/blog/4dfe473550069cb2c324d67b4dd3f75492a45f8a/content/images/2014/Jul/Swype.png?raw=true)
-
-####AOSP Keyboard
-
-![](https://raw.githubusercontent.com/xenon92/blog/4dfe473550069cb2c324d67b4dd3f75492a45f8a/content/images/2014/Jul/AOSP.png?raw=true)
+![](https://raw.githubusercontent.com/xenon92/blog/gh-pages/content/images/2015/11/play_google.jpg?raw=true)
 
 
 How to use?
@@ -47,9 +43,12 @@ Requirements
 Downloads
 ---
 
-Check the '**[Releases](https://github.com/xenon92/xposed-disable-fullscreen-keyboard/releases)**' section in my Github source.
-Check the '**[Xposed module repository](http://repo.xposed.info/module/com.shubhangrathore.xposed.disablefullscreenkeyboard)**'
+![](https://raw.githubusercontent.com/xenon92/blog/gh-pages/content/images/2015/11/1c50f4dc2c41c8c.png)
 
+- **[Google Play Store](https://play.google.com/store/apps/details?id=com.shubhangrathore.xposed.disablefullscreenkeyboard)
+- '**[Releases](https://github.com/xenon92/xposed-disable-fullscreen-keyboard/releases)**' section in my Github source.
+- **[Xposed module repository](http://repo.xposed.info/module/com.shubhangrathore.xposed.disablefullscreenkeyboard)**
+- **[Donate version](https://play.google.com/store/apps/details?id=com.shubhangrathore.xposed.disablefullscreenkeyboard.donate) on the Google Play Store
 
 Changelog
 ---
@@ -65,4 +64,4 @@ The source code is licensed under GNU General Public License v3 (**[GPL v3](http
 Copyright
 ---
 
-&copy; 2014 Shubhang Rathore
+&copy; 2014 - 2015 Shubhang Rathore
