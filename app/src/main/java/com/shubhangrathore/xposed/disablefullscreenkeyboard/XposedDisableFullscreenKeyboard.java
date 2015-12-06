@@ -38,6 +38,7 @@ public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit, I
 
     private static final String CLASS_INPUT_METHOD_SERVICE = "android.inputmethodservice.InputMethodService";
     private static final String SWIFTKEY_KEYBOARD = "com.touchtype.swiftkey";
+    private static final String SWIFTKEY_BETA_KEYBOARD = "com.touchtype.swiftkey.beta";
     private static final String SWIFTKEY_CLASS = "com.touchtype.keyboard.service.TouchTypeSoftKeyboard";
     private static final String TAG = "DisableFullscreenKeyboard";
 
@@ -97,8 +98,10 @@ public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit, I
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
 
-        //If package is not com.touchtype.swiftkey, return and not execute further
-        if (!loadPackageParam.packageName.equals(SWIFTKEY_KEYBOARD)) {
+        //If package is neither com.touchtype.swiftkey nor com.touchtype.swiftkey.beta,
+        //return and not execute further
+        if (!loadPackageParam.packageName.equals(SWIFTKEY_KEYBOARD)
+                && !loadPackageParam.packageName.equals(SWIFTKEY_BETA_KEYBOARD)) {
             return;
         }
 
