@@ -24,7 +24,6 @@ package com.shubhangrathore.xposed.disablefullscreenkeyboard;
 
 import android.util.Log;
 import android.view.Window;
-
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.IXposedHookZygoteInit;
 import de.robv.android.xposed.XC_MethodHook;
@@ -39,17 +38,31 @@ public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit, I
     private static final String CLASS_INPUT_METHOD_SERVICE = "android.inputmethodservice.InputMethodService";
     private static final String SWIFTKEY_KEYBOARD = "com.touchtype.swiftkey";
     private static final String SWIFTKEY_BETA_KEYBOARD = "com.touchtype.swiftkey.beta";
-    private static final String SWIFTKEY_CLASS = "com.touchtype.keyboard.service.TouchTypeSoftKeyboard";
     private static final String TAG = "DisableFullscreenKeyboard";
-
     private static boolean DEBUG = false;
 
-    @Override
-    public void initZygote(IXposedHookZygoteInit.StartupParam startupParam) throws Throwable {
+    private static final String[] SWIFTKEY_KEYBOARD_SERVICES = {
+            "com.touchtype.KeyboardService", //for SwiftKey 6.2+
+            "com.touchtype.keyboard.service.TouchTypeSoftKeyboard" //for SwiftKey 6.1
+    };
 
-        final Class<?> mInputMethodServiceClass = XposedHelpers.findClass(CLASS_INPUT_METHOD_SERVICE, null);
+    /*
+     * Helper method, which does not throw Exception, when method is not found
+     */
+    public static void hookIfExists(Class<?> clazz, String methodName, Object... parameterTypesAndCallback) {
+        try {
+            XposedHelpers.findAndHookMethod(clazz, methodName, parameterTypesAndCallback);
+        }catch (NoSuchMethodError e){
+            if(DEBUG) Log.i(TAG, e.getMessage());
+        }
+    }
 
-        XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "onEvaluateFullscreenMode", new XC_MethodHook() {
+    /*
+     * Hook all methods in InputMethodService or extended class
+     */
+    private static void hookMethods(final Class<?> mInputMethodServiceClass){
+
+        hookIfExists(mInputMethodServiceClass, "onEvaluateFullscreenMode", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
                 if (DEBUG) { Log.i(TAG, "beforeHookedMethod: onEvaluateFullscreenMode"); }
@@ -57,7 +70,7 @@ public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit, I
             }
         });
 
-        XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "isFullscreenMode", new XC_MethodHook() {
+        hookIfExists(mInputMethodServiceClass, "isFullscreenMode", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
                 if (DEBUG) { Log.i(TAG, "beforeHookedMethod: isFullscreenMode"); }
@@ -65,7 +78,7 @@ public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit, I
             }
         });
 
-        XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "isExtractViewShown", new XC_MethodHook() {
+        hookIfExists(mInputMethodServiceClass, "isExtractViewShown", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
                 if (DEBUG) { Log.i(TAG, "beforeHookedMethod: isExtractViewShown"); }
@@ -73,7 +86,7 @@ public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit, I
             }
         });
 
-        XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "onConfigureWindow", Window.class, boolean.class, boolean.class, new XC_MethodHook() {
+        hookIfExists(mInputMethodServiceClass, "onConfigureWindow", Window.class, boolean.class, boolean.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
                 if (DEBUG) { Log.i(TAG, "beforeHookedMethod: onConfigureWindow"); }
@@ -86,31 +99,26 @@ public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit, I
         });
     }
 
-    /**
-     * New updates to SwiftKey have implemented a custom onEvaluateFullscreenMode method
-     * instead of using the standard onEvaluateFullscreenMode method from the android
-     * InputMethodService. Hooking the custom method so it returns "false" to emulate
-     * potrait mode even in landscape. Hence, in landscape mode, the keyboard doesn't
-     * re-configure to full screen.
-     * @param loadPackageParam
-     * @throws Throwable
-     */
+    @Override
+    public void initZygote(IXposedHookZygoteInit.StartupParam startupParam) throws Throwable {
+        hookMethods(XposedHelpers.findClass(CLASS_INPUT_METHOD_SERVICE, null));
+    }
+
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
 
-        //If package is neither com.touchtype.swiftkey nor com.touchtype.swiftkey.beta,
-        //return and not execute further
-        if (!loadPackageParam.packageName.equals(SWIFTKEY_KEYBOARD)
-                && !loadPackageParam.packageName.equals(SWIFTKEY_BETA_KEYBOARD)) {
+        if (!loadPackageParam.packageName.equals(SWIFTKEY_KEYBOARD) &&
+            !loadPackageParam.packageName.equals(SWIFTKEY_BETA_KEYBOARD)) {
             return;
         }
 
-        XposedHelpers.findAndHookMethod(SWIFTKEY_CLASS, loadPackageParam.classLoader, "onEvaluateFullscreenMode", new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam methodHookParam) throws Throwable {
-                if (DEBUG) { Log.i(TAG, "Hooking to SwiftKey onEvaluateFullscreenMode Method"); }
-                methodHookParam.setResult(false);
-            }
-        });
+        /*
+         * Try to hook methods which, can be reimplemented in SwiftKey service
+         */
+        for(String service : SWIFTKEY_KEYBOARD_SERVICES)
+            try{
+                if (DEBUG) { Log.i(TAG, "SwiftKey service hook: " + service); }
+                hookMethods(XposedHelpers.findClass(service, loadPackageParam.classLoader));
+            }catch (XposedHelpers.ClassNotFoundError e){ }
     }
 }
