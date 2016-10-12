@@ -53,41 +53,53 @@ public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit, I
 
         final Class<?> mInputMethodServiceClass = XposedHelpers.findClass(CLASS_INPUT_METHOD_SERVICE, null);
 
-        XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "onEvaluateFullscreenMode", new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
-                if (DEBUG) { Log.i(TAG, "beforeHookedMethod: onEvaluateFullscreenMode"); }
-                methodHookParam.setResult(false);
-            }
-        });
+        try {
+            XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "onEvaluateFullscreenMode", new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
+                    if (DEBUG) {
+                        Log.i(TAG, "beforeHookedMethod: onEvaluateFullscreenMode");
+                    }
+                    methodHookParam.setResult(false);
+                }
+            });
 
-        XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "isFullscreenMode", new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
-                if (DEBUG) { Log.i(TAG, "beforeHookedMethod: isFullscreenMode"); }
-                methodHookParam.setResult(false);
-            }
-        });
+            XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "isFullscreenMode", new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
+                    if (DEBUG) {
+                        Log.i(TAG, "beforeHookedMethod: isFullscreenMode");
+                    }
+                    methodHookParam.setResult(false);
+                }
+            });
 
-        XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "isExtractViewShown", new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
-                if (DEBUG) { Log.i(TAG, "beforeHookedMethod: isExtractViewShown"); }
-                methodHookParam.setResult(false);
-            }
-        });
+            XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "isExtractViewShown", new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
+                    if (DEBUG) {
+                        Log.i(TAG, "beforeHookedMethod: isExtractViewShown");
+                    }
+                    methodHookParam.setResult(false);
+                }
+            });
 
-        XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "onConfigureWindow", Window.class, boolean.class, boolean.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
-                if (DEBUG) { Log.i(TAG, "beforeHookedMethod: onConfigureWindow"); }
-                // This forces the 2nd argument of the method to be always false.
-                // Hence when the onConfigureWindow method is executed, it executes assuming
-                // that it doesn't have to configure the window as fullscreen.
-                // This fixes window re-configuration of input fields in landscape mode.
-                methodHookParam.args[1] = false;
-            }
-        });
+            XposedHelpers.findAndHookMethod(mInputMethodServiceClass, "onConfigureWindow", Window.class, boolean.class, boolean.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(final MethodHookParam methodHookParam) throws Throwable {
+                    if (DEBUG) {
+                        Log.i(TAG, "beforeHookedMethod: onConfigureWindow");
+                    }
+                    // This forces the 2nd argument of the method to be always false.
+                    // Hence when the onConfigureWindow method is executed, it executes assuming
+                    // that it doesn't have to configure the window as fullscreen.
+                    // This fixes window re-configuration of input fields in landscape mode.
+                    methodHookParam.args[1] = false;
+                }
+            });
+        } catch (Throwable t) {
+            Log.e(TAG, "Unable to hook method in InputMethodService : " + t.getMessage());
+        }
     }
 
     /**
@@ -113,15 +125,21 @@ public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit, I
         for (String className : SWIFTKEY_KEYBOARD_SERVICES) {
             final Class<?> mSwiftKeyClass = XposedHelpers.findClassIfExists(className, loadPackageParam.classLoader);
             if (mSwiftKeyClass != null) {
-                //Try to hook onto the method, only when the class is found in the package
-                XposedHelpers.findAndHookMethod(mSwiftKeyClass, "onEvaluateFullscreenMode", new XC_MethodHook() {
-                    @Override
-                    protected void beforeHookedMethod(MethodHookParam methodHookParam) throws Throwable {
-                        if (DEBUG) { Log.i(TAG, "Hooking to SwiftKey onEvaluateFullscreenMode method" +
-                                "of Class : " + mSwiftKeyClass.getName()); }
-                        methodHookParam.setResult(false);
-                    }
-                });
+                try {
+                    //Try to hook onto the method, only when the class is found in the package
+                    XposedHelpers.findAndHookMethod(mSwiftKeyClass, "onEvaluateFullscreenMode", new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam methodHookParam) throws Throwable {
+                            if (DEBUG) {
+                                Log.i(TAG, "Hooking to SwiftKey onEvaluateFullscreenMode method" +
+                                        "of Class : " + mSwiftKeyClass.getName());
+                            }
+                            methodHookParam.setResult(false);
+                        }
+                    });
+                } catch (Throwable t) {
+                    Log.e(TAG, "Unable to hook method in SwiftKey class : " + mSwiftKeyClass.getName());
+                }
             }
         }
     }
