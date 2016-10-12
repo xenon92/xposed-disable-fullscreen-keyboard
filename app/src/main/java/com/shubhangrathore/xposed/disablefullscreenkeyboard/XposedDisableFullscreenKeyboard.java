@@ -39,8 +39,12 @@ public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit, I
     private static final String CLASS_INPUT_METHOD_SERVICE = "android.inputmethodservice.InputMethodService";
     private static final String SWIFTKEY_KEYBOARD = "com.touchtype.swiftkey";
     private static final String SWIFTKEY_BETA_KEYBOARD = "com.touchtype.swiftkey.beta";
-    private static final String SWIFTKEY_CLASS = "com.touchtype.keyboard.service.TouchTypeSoftKeyboard";
-    private static final String TAG = "DisableFullscreenKeyboard";
+    private static final String[] SWIFTKEY_KEYBOARD_SERVICES = {
+            "com.touchtype.keyboard.service.TouchTypeSoftKeyboard",             //SwiftKey 6.0+
+            "com.touchtype.KeyboardService"                                     //SwiftKey 6.2+
+    };
+
+    private static final String TAG = "DisableFullKeyboard";
 
     private static boolean DEBUG = false;
 
@@ -92,6 +96,7 @@ public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit, I
      * InputMethodService. Hooking the custom method so it returns "false" to emulate
      * potrait mode even in landscape. Hence, in landscape mode, the keyboard doesn't
      * re-configure to full screen.
+     *
      * @param loadPackageParam
      * @throws Throwable
      */
@@ -105,12 +110,19 @@ public class XposedDisableFullscreenKeyboard implements IXposedHookZygoteInit, I
             return;
         }
 
-        XposedHelpers.findAndHookMethod(SWIFTKEY_CLASS, loadPackageParam.classLoader, "onEvaluateFullscreenMode", new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam methodHookParam) throws Throwable {
-                if (DEBUG) { Log.i(TAG, "Hooking to SwiftKey onEvaluateFullscreenMode Method"); }
-                methodHookParam.setResult(false);
+        for (String className : SWIFTKEY_KEYBOARD_SERVICES) {
+            final Class<?> mSwiftKeyClass = XposedHelpers.findClassIfExists(className, loadPackageParam.classLoader);
+            if (mSwiftKeyClass != null) {
+                //Try to hook onto the method, only when the class is found in the package
+                XposedHelpers.findAndHookMethod(mSwiftKeyClass, "onEvaluateFullscreenMode", new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam methodHookParam) throws Throwable {
+                        if (DEBUG) { Log.i(TAG, "Hooking to SwiftKey onEvaluateFullscreenMode method" +
+                                "of Class : " + mSwiftKeyClass.getName()); }
+                        methodHookParam.setResult(false);
+                    }
+                });
             }
-        });
+        }
     }
 }
